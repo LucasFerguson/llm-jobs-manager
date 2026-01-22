@@ -4,12 +4,18 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
+  "type": "module",
+  "module": "esnext",
   "main": "index.js",
+  "target": "es2020",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "bullmq": "^5.66.6"
+    "bullmq": "^5.66.6",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.10"
   }
 }

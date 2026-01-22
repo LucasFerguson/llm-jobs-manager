@@ -1,10 +1,50 @@
-import { Queue } from 'bullmq';
+import 'dotenv/config';
+import { Queue, Worker } from 'bullmq';
 
-const myQueue = new Queue('foo');
+// Notes: https://github.com/taskforcesh/bullmq
 
-async function addJobs() {
-	await myQueue.add('myJobName', { foo: 'bar' });
-	await myQueue.add('myJobName', { qux: 'baz' });
+const connection = {
+	host: 'localhost',
+	port: 6379,
+	password: process.env.REDIS_PASSWORD
+};
+
+const queue = new Queue('Paint', {
+	connection: connection
+});
+
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+queue.add('cars', { color: 'blue' });
+
+const worker = new Worker('Paint', async job => {
+	if (job.name === 'cars') {
+		await paintCar(job.data.color);
+	}
+}, {
+	connection: connection
+});
+
+async function paintCar(color: string) {
+	console.log(`Painting a car ${color}`);
 }
 
-await addJobs();
+worker.on('completed', job => {
+	console.log(`Job ${job.id} has completed!`);
+});
+
+worker.on('failed', (job, err) => {
+	console.log(`Job ${job?.id} has failed with error ${err.message}`);
+});
+
+
+
