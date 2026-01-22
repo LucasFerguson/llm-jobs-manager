@@ -1,4 +1,7 @@
 node_modules
+build
 .env
 index.js
 cache_data
+input/*
+output/*

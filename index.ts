@@ -1,50 +1,37 @@
-import 'dotenv/config';
-import { Queue, Worker } from 'bullmq';
+import "dotenv/config";
+import { llmQueue } from "./scheduler/queue.js";
 
-// Notes: https://github.com/taskforcesh/bullmq
+// this is just for demo purposes; in real usage, jobs would be added by other parts of your system
 
-const connection = {
-	host: 'localhost',
-	port: 6379,
-	password: process.env.REDIS_PASSWORD
-};
+async function seedDemoJobs() {
+	await llmQueue.add("openwebui-priority", {
+		prompt: "Summarize daily news for dashboard",
+		source: "openwebui",
+		model: "gpt-oss:20b",
+		timeoutMs: 60_000,
+	}, { priority: 1 }); // highest priority
 
-const queue = new Queue('Paint', {
-	connection: connection
-});
+	await llmQueue.add("n8n-low", {
+		prompt: "Generate product taglines",
+		source: "n8n",
+		model: "gpt-oss:20b",
+		timeoutMs: 60_000,
+	}, { priority: 5 });
 
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
-queue.add('cars', { color: 'blue' });
+	await llmQueue.add("n8n-low", {
+		prompt: "Translate support snippets",
+		source: "n8n",
+		model: "gpt-oss:20b",
+		timeoutMs: 60_000,
+	}, { priority: 5 });
 
-const worker = new Worker('Paint', async job => {
-	if (job.name === 'cars') {
-		await paintCar(job.data.color);
-	}
-}, {
-	connection: connection
-});
-
-async function paintCar(color: string) {
-	console.log(`Painting a car ${color}`);
+	console.log("Seeded demo jobs (Open WebUI high priority, n8n lower).");
 }
 
-worker.on('completed', job => {
-	console.log(`Job ${job.id} has completed!`);
-});
+// await seedDemoJobs();
 
-worker.on('failed', (job, err) => {
-	console.log(`Job ${job?.id} has failed with error ${err.message}`);
-});
-
+setInterval(() => {
+	seedDemoJobs().catch(console.error);
+}, 1000); // every 1 second, for demo purposes
 
 

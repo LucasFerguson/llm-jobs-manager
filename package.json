@@ -9,13 +9,24 @@
   "main": "index.js",
   "target": "es2020",
   "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "start:worker": "node build/scheduler/worker.js",
+    "start:dashboard": "node build/scheduler/dashboard.js",
+    "analyze": "tsx pipeline/analyze-markdown.ts",
+    "dev": "concurrently -n \"worker,dashboard\" -c \"cyan,magenta\" \"tsx watch scheduler/worker.ts\" \"tsx watch scheduler/dashboard.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@bull-board/api": "^6.16.2",
+    "@bull-board/express": "^6.16.2",
     "bullmq": "^5.66.6",
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.0.0",
+    "ioredis": "^5.4.1"
   },
   "devDependencies": {
-    "@types/node": "^25.0.10"
+    "@types/node": "^25.0.10",
+    "concurrently": "^9.2.1",
+    "tsx": "^4.21.0"
   }
 }
