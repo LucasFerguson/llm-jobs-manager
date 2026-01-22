@@ -18,9 +18,14 @@ Analyzing Obsidian files:
 - `npm run analyze input/your-file.md output/results.csv`
 - See ANALYZE-README.md for details
 
+Project hierarchy summaries:
+- `npm run hierarchy <vaultPath> <outputPath> [noteSent=2] [folderSent=3] [rootSent=5] [model=gpt-oss:20b]`
+- Uses `project-hierarchy/hierarchy.ts` to summarize notes and folders bottom-up and writes copies with YAML frontmatter into the output path
+
 Project structure:
 - `scheduler/` - Queue, worker, and dashboard code
 - `pipeline/` - Markdown analysis and CSV generation
+- `project-hierarchy/` - Vault-wide hierarchical summarization
 - `input/` - Place your markdown files here
 - `output/` - Generated CSV files go here
 

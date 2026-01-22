@@ -28,3 +28,6 @@ export const llmQueue = new Queue("llm", {
 		removeOnFail: 1000,
 	},
 });
+
+// Avoid MaxListeners warnings when many jobs are enqueued
+llmQueue.setMaxListeners(0);

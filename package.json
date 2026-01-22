@@ -14,6 +14,8 @@
     "start:worker": "node build/scheduler/worker.js",
     "start:dashboard": "node build/scheduler/dashboard.js",
     "analyze": "tsx pipeline/analyze-markdown.ts",
+    "hierarchy": "tsx project-hierarchy/hierarchy.ts",
+    "search": "tsx vault-search/search.ts",
     "dev": "concurrently -n \"worker,dashboard\" -c \"cyan,magenta\" \"tsx watch scheduler/worker.ts\" \"tsx watch scheduler/dashboard.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

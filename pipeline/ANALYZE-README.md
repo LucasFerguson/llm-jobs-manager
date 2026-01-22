@@ -45,6 +45,7 @@ npm run analyze input/sample-notes.md output/results.csv
 - `pipeline/csv-writer.ts` - Converts results to CSV
 - `pipeline/analyze-markdown.ts` - Main orchestrator script
 - `pipeline/types.ts` - TypeScript types and CSV schema
+- `project-hierarchy/` - Hierarchical vault summarizer (notes → folders → root)
 - `scheduler/` - Queue and worker management
 - `input/` - Place your markdown files here
 - `output/` - Generated CSV files appear here
