@@ -13,22 +13,29 @@
     "start": "node build/index.js",
     "start:worker": "node build/scheduler/worker.js",
     "start:dashboard": "node build/scheduler/dashboard.js",
+    "start:agent-api": "node build/agent/api.js",
+    "start:gateway": "node build/gateway/server.js",
     "analyze": "tsx pipeline/analyze-markdown.ts",
     "hierarchy": "tsx project-hierarchy/hierarchy.ts",
     "search": "tsx vault-search/search.ts",
-    "dev": "concurrently -n \"worker,dashboard\" -c \"cyan,magenta\" \"tsx watch scheduler/worker.ts\" \"tsx watch scheduler/dashboard.ts\"",
+    "dev": "concurrently -n \"worker,dashboard,agent-api,gateway\" -c \"cyan,magenta,green,yellow\" \"tsx watch scheduler/worker.ts\" \"tsx watch scheduler/dashboard.ts\" \"tsx watch agent/api.ts\" \"tsx watch gateway/server.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@bull-board/api": "^6.16.2",
     "@bull-board/express": "^6.16.2",
+    "better-sqlite3": "^11.10.0",
     "bullmq": "^5.66.6",
     "dotenv": "^16.0.0",
+    "express": "^5.2.0",
     "ioredis": "^5.4.1"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/express": "^5.0.6",
     "@types/node": "^25.0.10",
     "concurrently": "^9.2.1",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
   }
 }

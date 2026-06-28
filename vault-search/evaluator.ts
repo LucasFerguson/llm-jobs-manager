@@ -2,6 +2,7 @@ import { llmQueue, connection } from "../scheduler/queue.js";
 import { QueueEvents } from "bullmq";
 import type { RelevanceJudgment } from "./types.js";
 import { makeEvaluationPrompt, makeFolderEvaluationPrompt } from "./types.js";
+import { parseJsonResponse } from "../lib/json-utils.js";
 
 let sharedQueueEvents: QueueEvents | null = null;
 
@@ -38,22 +39,8 @@ export async function evaluateNote(
 	);
 
 	const result = await job.waitUntilFinished(getQueueEvents());
-	try {
-		// Remove markdown code fences if present
-		let cleaned = result.trim();
-		if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
-		if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
-		if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
-		cleaned = cleaned.trim();
-
-		const parsed = JSON.parse(cleaned);
-		return {
-			relevant: parsed.relevant ?? false,
-			confidence: parsed.confidence ?? 0,
-			reason: parsed.reason ?? "",
-			excerpt: parsed.excerpt ?? undefined,
-		};
-	} catch (e) {
+	const parsed = parseJsonResponse<Record<string, any> | null>(result, null);
+	if (!parsed) {
 		console.warn("❌ Failed to parse note evaluator response:", result);
 		return {
 			relevant: false,
@@ -61,6 +48,12 @@ export async function evaluateNote(
 			reason: "LLM response parse error",
 		};
 	}
+	return {
+		relevant: parsed.relevant ?? false,
+		confidence: parsed.confidence ?? 0,
+		reason: parsed.reason ?? "",
+		excerpt: parsed.excerpt ?? undefined,
+	};
 }
 
 /**
@@ -80,22 +73,8 @@ export async function evaluateFolder(
 	);
 
 	const result = await job.waitUntilFinished(getQueueEvents());
-	try {
-		// Remove markdown code fences if present
-		let cleaned = result.trim();
-		if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
-		if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
-		if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
-		cleaned = cleaned.trim();
-
-		const parsed = JSON.parse(cleaned);
-		return {
-			relevant: parsed.relevant ?? false,
-			confidence: parsed.confidence ?? 0,
-			reason: parsed.reason ?? "",
-			suggestedExplore: parsed.suggestedExplore ?? [],
-		};
-	} catch (e) {
+	const parsed = parseJsonResponse<Record<string, any> | null>(result, null);
+	if (!parsed) {
 		console.warn("❌ Failed to parse folder evaluator response:", result);
 		return {
 			relevant: false,
@@ -103,4 +82,10 @@ export async function evaluateFolder(
 			reason: "LLM response parse error",
 		};
 	}
+	return {
+		relevant: parsed.relevant ?? false,
+		confidence: parsed.confidence ?? 0,
+		reason: parsed.reason ?? "",
+		suggestedExplore: parsed.suggestedExplore ?? [],
+	};
 }

@@ -10,7 +10,7 @@ const DEFAULT_MAX_RESULTS = 10;
 /**
  * Orchestrator: intelligently searches vault by traversing hierarchy and evaluating relevance.
  */
-async function searchVault(
+export async function searchVault(
 	query: string,
 	vaultRoot: string,
 	model: string = "gpt-oss:20b",

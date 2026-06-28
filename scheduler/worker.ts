@@ -29,6 +29,23 @@ async function callLiteLLMWithAbort(prompt: string, model: string, signal: Abort
 	return json.choices?.[0]?.message?.content ?? json;
 }
 
+async function callLiteLLMRaw(body: Record<string, any>, signal: AbortSignal) {
+	const url = `${LITELLM_BASE_URL}/v1/chat/completions`;
+
+	const headers: Record<string, string> = { "content-type": "application/json" };
+	if (LITELLM_API_KEY) headers["Authorization"] = `Bearer ${LITELLM_API_KEY}`;
+
+	const res = await fetch(url, {
+		method: "POST",
+		headers,
+		body: JSON.stringify(body),
+		signal,
+	});
+
+	if (!res.ok) throw new Error(`LiteLLM error: ${res.status} ${await res.text()}`);
+	return res.json();
+}
+
 export const worker = new Worker(
 	"llm",
 	async (job: { data: LLMJobData }) => {
@@ -39,7 +56,9 @@ export const worker = new Worker(
 		}, job.data.timeoutMs ?? HARD_TIMEOUT_MS);
 
 		try {
-			const out = await callLiteLLMWithAbort(job.data.prompt, job.data.model, controller.signal);
+			const out = job.data.requestBody
+				? await callLiteLLMRaw(job.data.requestBody, controller.signal)
+				: await callLiteLLMWithAbort(job.data.prompt, job.data.model, controller.signal);
 			return out;
 		} catch (e: any) {
 			// If it was our timeout, fail in a way that avoids retries

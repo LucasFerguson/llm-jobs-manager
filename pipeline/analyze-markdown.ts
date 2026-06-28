@@ -5,6 +5,7 @@ import { parseMarkdownToBlocks } from "./markdown-parser.js";
 import { createAnalysisPrompt } from "./prompt-template.js";
 import { writeBlocksToCSV } from "./csv-writer.js";
 import type { AnalyzedBlock } from "./types.js";
+import { parseJsonResponse } from "../lib/json-utils.js";
 
 /**
  * Process an Obsidian markdown file: split into blocks, analyze with LLM, output CSV
@@ -47,22 +48,18 @@ export async function processObsidianFile(
 			const result = await job.waitUntilFinished(queueEvents);
 
 			// Parse LLM response (should be JSON)
-			let parsed;
-			try {
-				// Remove potential markdown code fences
-				const cleaned = result.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-				parsed = JSON.parse(cleaned);
-			} catch (parseErr) {
+			const parseFallback = {
+				summary: "Parse error",
+				category: "Unknown",
+				key_topics: "",
+				entities: "",
+				sentiment: "neutral",
+				actionable: "no",
+				tags: "",
+			};
+			const parsed = parseJsonResponse(result, parseFallback);
+			if (parsed === parseFallback) {
 				console.warn(`⚠️  Block ${blockNumber}: Failed to parse JSON, using defaults`);
-				parsed = {
-					summary: "Parse error",
-					category: "Unknown",
-					key_topics: "",
-					entities: "",
-					sentiment: "neutral",
-					actionable: "no",
-					tags: "",
-				};
 			}
 
 			results.push({

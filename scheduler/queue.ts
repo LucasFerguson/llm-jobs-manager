@@ -18,6 +18,10 @@ export interface LLMJobData {
 	source: string;
 	model: string;
 	timeoutMs?: number;
+	// If set, forwarded as-is to LiteLLM instead of `prompt` (full message history,
+	// e.g. from an OpenAI-compatible client like Open WebUI). The job result is then
+	// the full LiteLLM response JSON instead of just the extracted message content.
+	requestBody?: Record<string, any>;
 }
 
 export const llmQueue = new Queue("llm", {
